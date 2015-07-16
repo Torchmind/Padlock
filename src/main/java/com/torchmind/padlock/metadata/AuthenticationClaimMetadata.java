@@ -108,9 +108,8 @@ public class AuthenticationClaimMetadata {
          * @return True if expired.
          */
         public boolean expired (@Nonnull Instant instant) {
-                if (instant.isBefore (this.issuance)) return true;
                 if (this.expiration () == null) return false;
-                return (!instant.isAfter (this.expiration));
+                return (instant.isAfter (this.expiration));
         }
 
         /**
