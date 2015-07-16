@@ -34,6 +34,10 @@ public class AuthenticationClaimMetadata {
         private Instant issuance;
         private Instant expiration;
 
+        private AuthenticationClaimMetadata () {
+                this.identifier = null;
+        }
+
         public AuthenticationClaimMetadata (@Nonnull UUID identifier, @Nonnull Instant issuance, @Nullable Instant expiration) {
                 this.identifier = identifier;
                 this.issuance = issuance;
