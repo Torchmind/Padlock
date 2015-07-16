@@ -173,4 +173,31 @@ public class AuthenticationClaimMetadata {
                 this.issuance (issuance);
                 return this.expiration (expiration);
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals (Object o) {
+                if (this == o) { return true; }
+                if (!(o instanceof AuthenticationClaimMetadata)) { return false; }
+
+                AuthenticationClaimMetadata that = (AuthenticationClaimMetadata) o;
+
+                if (!identifier.equals (that.identifier)) { return false; }
+                if (!issuance.equals (that.issuance)) { return false; }
+                return !(expiration != null ? !expiration.equals (that.expiration) : that.expiration != null);
+
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int hashCode () {
+                int result = identifier.hashCode ();
+                result = 31 * result + issuance.hashCode ();
+                result = 31 * result + (expiration != null ? expiration.hashCode () : 0);
+                return result;
+        }
 }
