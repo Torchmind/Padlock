@@ -16,6 +16,8 @@
  */
 package com.torchmind.padlock.metadata;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.time.Duration;
@@ -26,6 +28,7 @@ import java.util.UUID;
  * Represents an authentication claim.
  * @author Johannes Donath
  */
+@JsonAutoDetect (fieldVisibility = JsonAutoDetect.Visibility.ANY, creatorVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
 public class AuthenticationClaim {
         private final UUID identifier;
         private Instant issuance;
