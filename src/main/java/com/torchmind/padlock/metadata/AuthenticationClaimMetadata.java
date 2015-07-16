@@ -25,7 +25,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Represents an authentication claim.
+ * Represents metadata stored within an authentication claim.
  * @author Johannes Donath
  */
 @JsonAutoDetect (fieldVisibility = JsonAutoDetect.Visibility.ANY, creatorVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
