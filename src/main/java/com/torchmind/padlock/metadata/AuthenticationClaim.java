@@ -114,6 +114,14 @@ public class AuthenticationClaim {
         }
 
         /**
+         * Checks whether the claim expires at a certain point of time.
+         * @return True if claim expires.
+         */
+        public boolean expires () {
+                return (this.expiration () != null);
+        }
+
+        /**
          * Retrieves the validity period.
          * <strong>Note:</strong> If no expiration is set, a zero-length duration is returned.
          * @return The period.
