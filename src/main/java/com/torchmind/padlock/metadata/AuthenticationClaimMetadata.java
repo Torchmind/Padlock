@@ -29,22 +29,22 @@ import java.util.UUID;
  * @author Johannes Donath
  */
 @JsonAutoDetect (fieldVisibility = JsonAutoDetect.Visibility.ANY, creatorVisibility = JsonAutoDetect.Visibility.NONE, getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
-public class AuthenticationClaim {
+public class AuthenticationClaimMetadata {
         private final UUID identifier;
         private Instant issuance;
         private Instant expiration;
 
-        public AuthenticationClaim (@Nonnull UUID identifier, @Nonnull Instant issuance, @Nullable Instant expiration) {
+        public AuthenticationClaimMetadata (@Nonnull UUID identifier, @Nonnull Instant issuance, @Nullable Instant expiration) {
                 this.identifier = identifier;
                 this.issuance = issuance;
                 this.expiration = expiration;
         }
 
-        public AuthenticationClaim (@Nonnull UUID identifier, @Nonnull Instant issuance, @Nonnull Duration duration) {
+        public AuthenticationClaimMetadata (@Nonnull UUID identifier, @Nonnull Instant issuance, @Nonnull Duration duration) {
                 this (identifier, issuance, issuance.plus (duration));
         }
 
-        public AuthenticationClaim (@Nonnull UUID identifier, @Nonnull Duration duration) {
+        public AuthenticationClaimMetadata (@Nonnull UUID identifier, @Nonnull Duration duration) {
                 this (identifier, Instant.now (), duration);
         }
 
@@ -72,7 +72,7 @@ public class AuthenticationClaim {
          * @return The claim.
          */
         @Nonnull
-        public AuthenticationClaim issuance (@Nonnull Instant issuance) {
+        public AuthenticationClaimMetadata issuance (@Nonnull Instant issuance) {
                 this.issuance = issuance;
                 return this;
         }
@@ -92,7 +92,7 @@ public class AuthenticationClaim {
          * @return The claim.
          */
         @Nonnull
-        public AuthenticationClaim expiration (@Nullable Instant expiration) {
+        public AuthenticationClaimMetadata expiration (@Nullable Instant expiration) {
                 this.expiration = expiration;
                 return this;
         }
@@ -141,7 +141,7 @@ public class AuthenticationClaim {
          * @return The claim.
          */
         @Nonnull
-        public AuthenticationClaim validity (@Nonnull Duration duration) {
+        public AuthenticationClaimMetadata validity (@Nonnull Duration duration) {
                 this.expiration (this.issuance ().plus (duration));
                 return this;
         }
@@ -153,7 +153,7 @@ public class AuthenticationClaim {
          * @return The claim.
          */
         @Nonnull
-        public AuthenticationClaim validity (@Nonnull Instant issuance, @Nonnull Duration duration) {
+        public AuthenticationClaimMetadata validity (@Nonnull Instant issuance, @Nonnull Duration duration) {
                 this.issuance (issuance);
                 return this.validity (duration);
         }
@@ -165,7 +165,7 @@ public class AuthenticationClaim {
          * @return The claim.
          */
         @Nonnull
-        public AuthenticationClaim validity (@Nonnull Instant issuance, @Nonnull Instant expiration) {
+        public AuthenticationClaimMetadata validity (@Nonnull Instant issuance, @Nonnull Instant expiration) {
                 this.issuance (issuance);
                 return this.expiration (expiration);
         }
