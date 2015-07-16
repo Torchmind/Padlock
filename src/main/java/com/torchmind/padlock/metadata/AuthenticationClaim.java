@@ -17,6 +17,7 @@
 package com.torchmind.padlock.metadata;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
@@ -30,7 +31,7 @@ public class AuthenticationClaim {
         private Instant issuance;
         private Instant expiration;
 
-        public AuthenticationClaim (@Nonnull UUID identifier, @Nonnull Instant issuance, @Nonnull Instant expiration) {
+        public AuthenticationClaim (@Nonnull UUID identifier, @Nonnull Instant issuance, @Nullable Instant expiration) {
                 this.identifier = identifier;
                 this.issuance = issuance;
                 this.expiration = expiration;
@@ -77,7 +78,7 @@ public class AuthenticationClaim {
          * Retrieves the claim expiration.
          * @return The expiration.
          */
-        @Nonnull
+        @Nullable
         public Instant expiration () {
                 return this.expiration;
         }
@@ -88,7 +89,7 @@ public class AuthenticationClaim {
          * @return The claim.
          */
         @Nonnull
-        public AuthenticationClaim expiration (@Nonnull Instant expiration) {
+        public AuthenticationClaim expiration (@Nullable Instant expiration) {
                 this.expiration = expiration;
                 return this;
         }
@@ -99,7 +100,9 @@ public class AuthenticationClaim {
          * @return True if expired.
          */
         public boolean expired (@Nonnull Instant instant) {
-                return (!instant.isBefore (this.issuance) && !instant.isAfter (this.expiration));
+                if (instant.isBefore (this.issuance)) return true;
+                if (this.expiration () == null) return false;
+                return (!instant.isAfter (this.expiration));
         }
 
         /**
@@ -112,10 +115,12 @@ public class AuthenticationClaim {
 
         /**
          * Retrieves the validity period.
+         * <strong>Note:</strong> If no expiration is set, a zero-length duration is returned.
          * @return The period.
          */
         @Nonnull
         public Duration validity () {
+                if (this.expiration () == null) return Duration.ZERO;
                 return Duration.between (this.issuance (), this.expiration ());
         }
 
