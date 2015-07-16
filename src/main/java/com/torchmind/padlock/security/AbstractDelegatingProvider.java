@@ -29,8 +29,8 @@ public abstract class AbstractDelegatingProvider<P, K extends Key> extends Abstr
         private final P provider;
 
         public AbstractDelegatingProvider (@Nonnull P provider, @Nonnull K key) throws IllegalArgumentException {
-                super (key);
                 this.provider = provider;
+                this.key (key);
         }
 
         /**

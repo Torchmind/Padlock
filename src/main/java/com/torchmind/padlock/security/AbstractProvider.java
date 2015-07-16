@@ -26,12 +26,6 @@ import java.security.Key;
 public abstract class AbstractProvider<K extends Key> implements IProvider<K> {
         private K key;
 
-        public AbstractProvider (@Nonnull K key) throws IllegalArgumentException {
-                super ();
-
-                this.key (key);
-        }
-
         /**
          * {@inheritDoc}
          */
