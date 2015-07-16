@@ -28,7 +28,8 @@ import java.security.Key;
 public abstract class AbstractDelegatingProvider<P, K extends Key> extends AbstractProvider<K> {
         private final P provider;
 
-        public AbstractDelegatingProvider (@Nonnull P provider) {
+        public AbstractDelegatingProvider (@Nonnull K key, @Nonnull P provider) {
+                super (key);
                 this.provider = provider;
         }
 
