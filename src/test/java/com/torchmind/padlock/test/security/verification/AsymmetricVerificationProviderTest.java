@@ -44,7 +44,7 @@ public class AsymmetricVerificationProviderTest {
          * Prepares the class for test cases contained herein.
          */
         @Before
-        public void setupStatic () throws NoSuchAlgorithmException, InvalidKeySpecException {
+        public void setup () throws NoSuchAlgorithmException, InvalidKeySpecException {
                 KeyFactory factory = KeyFactory.getInstance ("RSA");
                 X509EncodedKeySpec keySpec = new X509EncodedKeySpec (KEY_BYTES);
                 rsaKey = factory.generatePublic (keySpec);

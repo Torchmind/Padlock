@@ -44,7 +44,7 @@ public class AsymmetricSignatureProviderTest {
          * Prepares the class for test cases contained herein.
          */
         @Before
-        public void setupStatic () throws NoSuchAlgorithmException, InvalidKeySpecException {
+        public void setup () throws NoSuchAlgorithmException, InvalidKeySpecException {
                 KeyFactory factory = KeyFactory.getInstance ("RSA");
                 PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec (KEY_BYTES);
                 rsaKey = factory.generatePrivate (keySpec);
