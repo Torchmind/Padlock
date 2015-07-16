@@ -187,6 +187,29 @@ public class AuthenticationClaimMetadata {
         }
 
         /**
+         * Executes {@code consumer} when the claim is not yet valid at a certain point of time.
+         * @param instant The time.
+         * @param consumer The consumer.
+         * @return The claim.
+         */
+        @Nonnull
+        public AuthenticationClaimMetadata ifNotYetValid (@Nonnull Instant instant, @Nonnull Consumer<AuthenticationClaimMetadata> consumer) {
+                if (this.notYetValid (instant)) consumer.accept (this);
+                return this;
+        }
+
+        /**
+         * Executes {@code consumer} when the claim is not yet valid.
+         * @param consumer The consumer.
+         * @return The claim.
+         */
+        @Nonnull
+        public AuthenticationClaimMetadata ifNotYetValid (@Nonnull Consumer<AuthenticationClaimMetadata> consumer) {
+                if (this.notYetValid ()) consumer.accept (this);
+                return this;
+        }
+
+        /**
          * Executes {@code consumer} when the claim is valid at a certain point of time.
          * @param instant The time.
          * @param consumer The consumer.
@@ -206,6 +229,29 @@ public class AuthenticationClaimMetadata {
         @Nonnull
         public AuthenticationClaimMetadata ifValid (@Nonnull Consumer<AuthenticationClaimMetadata> consumer) {
                 if (this.valid ()) consumer.accept (this);
+                return this;
+        }
+
+        /**
+         * Executes {@code consumer} when the claim is not valid at a certain point of time.
+         * @param instant The time.
+         * @param consumer The consumer.
+         * @return The claim.
+         */
+        @Nonnull
+        public AuthenticationClaimMetadata ifInvalid (@Nonnull Instant instant, @Nonnull Consumer<AuthenticationClaimMetadata> consumer) {
+                if (!this.valid (instant)) consumer.accept (this);
+                return this;
+        }
+
+        /**
+         * Executes {@code consumer} when the claim is not valid.
+         * @param consumer The consumer.
+         * @return The claim
+         */
+        @Nonnull
+        public AuthenticationClaimMetadata ifInvalid (@Nonnull Consumer<AuthenticationClaimMetadata> consumer) {
+                if (!this.valid ()) consumer.accept (this);
                 return this;
         }
 
