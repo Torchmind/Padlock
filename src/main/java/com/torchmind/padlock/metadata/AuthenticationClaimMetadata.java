@@ -130,6 +130,40 @@ public class AuthenticationClaimMetadata {
         }
 
         /**
+         * Checks whether the claim is not yet valid at a certain point of time.
+         * @param instant The time.
+         * @return True if not yet valid.
+         */
+        public boolean notYetValid (@Nonnull Instant instant) {
+                return instant.isBefore (this.issuance ());
+        }
+
+        /**
+         * Checks whether the claim is not yet valid.
+         * @return True if not yet valid.
+         */
+        public boolean notYetValid () {
+                return this.notYetValid (Instant.now ());
+        }
+
+        /**
+         * Checks whether the claim is valid at a certain point of time.
+         * @param instant The time.
+         * @return True if valid.
+         */
+        public boolean valid (@Nonnull Instant instant) {
+                return (!this.notYetValid (instant) && !this.expired (instant));
+        }
+
+        /**
+         * Checks whether the claim is valid.
+         * @return The time.
+         */
+        public boolean valid () {
+                return this.valid (Instant.now ());
+        }
+
+        /**
          * Executes {@code consumer} when the claim has expired at a certain point of time.
          * @param instant The time.
          * @param consumer The consumer.
@@ -160,7 +194,7 @@ public class AuthenticationClaimMetadata {
          */
         @Nonnull
         public AuthenticationClaimMetadata ifValid (@Nonnull Instant instant, @Nonnull Consumer<AuthenticationClaimMetadata> consumer) {
-                if (!this.expired ()) consumer.accept (this);
+                if (this.valid (instant)) consumer.accept (this);
                 return this;
         }
 
@@ -171,7 +205,7 @@ public class AuthenticationClaimMetadata {
          */
         @Nonnull
         public AuthenticationClaimMetadata ifValid (@Nonnull Consumer<AuthenticationClaimMetadata> consumer) {
-                if (!this.expired ()) consumer.accept (this);
+                if (this.valid ()) consumer.accept (this);
                 return this;
         }
 
