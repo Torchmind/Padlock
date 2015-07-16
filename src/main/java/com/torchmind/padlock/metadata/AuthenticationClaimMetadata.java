@@ -23,6 +23,7 @@ import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Represents metadata stored within an authentication claim.
@@ -126,6 +127,52 @@ public class AuthenticationClaimMetadata {
          */
         public boolean expires () {
                 return (this.expiration () != null);
+        }
+
+        /**
+         * Executes {@code consumer} when the claim has expired at a certain point of time.
+         * @param instant The time.
+         * @param consumer The consumer.
+         * @return The claim.
+         */
+        @Nonnull
+        public AuthenticationClaimMetadata ifExpired (@Nonnull Instant instant, @Nonnull Consumer<AuthenticationClaimMetadata> consumer) {
+                if (this.expired (instant)) consumer.accept (this);
+                return this;
+        }
+
+        /**
+         * Executes {@code consumer} when the claim has expired.
+         * @param consumer The consumer.
+         * @return The claim.
+         */
+        @Nonnull
+        public AuthenticationClaimMetadata ifExpired (@Nonnull Consumer<AuthenticationClaimMetadata> consumer) {
+                if (this.expired ()) consumer.accept (this);
+                return this;
+        }
+
+        /**
+         * Executes {@code consumer} when the claim is valid at a certain point of time.
+         * @param instant The time.
+         * @param consumer The consumer.
+         * @return The claim.
+         */
+        @Nonnull
+        public AuthenticationClaimMetadata ifValid (@Nonnull Instant instant, @Nonnull Consumer<AuthenticationClaimMetadata> consumer) {
+                if (!this.expired ()) consumer.accept (this);
+                return this;
+        }
+
+        /**
+         * Executes {@code consumer} when the claim is valid.
+         * @param consumer The consumer.
+         * @return The claim.
+         */
+        @Nonnull
+        public AuthenticationClaimMetadata ifValid (@Nonnull Consumer<AuthenticationClaimMetadata> consumer) {
+                if (!this.expired ()) consumer.accept (this);
+                return this;
         }
 
         /**
