@@ -31,7 +31,8 @@ public interface IVerificationProvider<K extends Key> extends IProvider<K> {
         /**
          * Verifies an authentication claim signature.
          * @param metadata The metadata.
+         * @param signature The signature.
          * @return True if signature is valid.
          */
-        boolean verify (@Nonnull ByteBuffer metadata);
+        boolean verify (@Nonnull ByteBuffer metadata, @Nonnull ByteBuffer signature);
 }
