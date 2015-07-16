@@ -51,7 +51,7 @@ public class AsymmetricVerificationProviderTest {
         }
 
         /**
-         * Tests {@link com.torchmind.padlock.security.signature.AsymmetricSignatureProvider#sign(java.nio.ByteBuffer)}.
+         * Tests {@link com.torchmind.padlock.security.verification.AsymmetricVerificationProvider#verify(java.nio.ByteBuffer, java.nio.ByteBuffer)}.
          */
         @Test
         public void testSign () throws NoSuchAlgorithmException, SignatureException {
