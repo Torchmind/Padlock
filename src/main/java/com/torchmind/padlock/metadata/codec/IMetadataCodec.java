@@ -33,8 +33,9 @@ public interface IMetadataCodec {
          * @param encoded The encoded metadata.
          * @param <M> The metadata type.
          * @return The decoded metadata.
+         * @throws java.lang.IllegalArgumentException when decoding the metadata fails.
          */
-        <M extends AuthenticationClaimMetadata> M decode (@Nonnull Class<M> type, @Nonnull ByteBuffer encoded);
+        <M extends AuthenticationClaimMetadata> M decode (@Nonnull Class<M> type, @Nonnull ByteBuffer encoded) throws IllegalArgumentException;
 
         /**
          * Encodes authentication claim metadata.
@@ -42,6 +43,7 @@ public interface IMetadataCodec {
          * @param decoded The decoded metadata.
          * @param <M> The metadata type.
          * @return The encoded metadata.
+         * @throws java.lang.IllegalStateException when encoding the metadata fails.
          */
-        <M extends AuthenticationClaimMetadata> ByteBuffer encode (@Nonnull Class<M> type, @Nonnull M decoded);
+        <M extends AuthenticationClaimMetadata> ByteBuffer encode (@Nonnull Class<M> type, @Nonnull M decoded) throws IllegalStateException;
 }
