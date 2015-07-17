@@ -32,6 +32,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.nio.ByteBuffer;
 import java.security.SignatureException;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -163,6 +164,16 @@ public class PadlockTest {
                 Assert.assertEquals (AuthenticationClaimMetadata.class, claim.metadataType ());
                 Assert.assertEquals (TEST_METADATA, claim.metadata ());
                 Assert.assertEquals (ByteBuffer.wrap (TEST_SIGNATURE), claim.signature ());
+        }
+
+        /**
+         * Tests {@link com.torchmind.padlock.Padlock#sign(Class, com.torchmind.padlock.metadata.AuthenticationClaimMetadata)}
+         * sanity checks.
+         */
+        @Test (expected = IllegalArgumentException.class)
+        public void testSignLimitation () throws SignatureException {
+                Padlock padlock = Padlock.builder ().metadataCodec (this.metadataCodec).signatureProvider (this.signatureProvider).maximumValidityDuration (Duration.ZERO).build ();
+                IAuthenticationClaim<AuthenticationClaimMetadata> claim = padlock.sign (AuthenticationClaimMetadata.class, TEST_METADATA);
         }
 
         /**
