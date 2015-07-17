@@ -232,19 +232,30 @@ public final class Padlock {
 
                 /**
                  * Builds the {@link com.torchmind.padlock.Padlock} instance.
+                 * @param reset If true, resets the factory after building.
                  * @return The instance.
                  * @throws java.lang.IllegalStateException when the configuration is invalid.
                  */
                 @Nonnull
-                public Padlock build () throws IllegalStateException {
+                public Padlock build (boolean reset) throws IllegalStateException {
                         IMetadataCodec metadataCodec = this.metadataCodec ();
                         if (metadataCodec == null) metadataCodec = new JacksonMetadataCodec ();
 
                         try {
                                 return (new Padlock (this.maximumValidityDuration (), metadataCodec, this.signatureProvider (), this.verificationProvider ()));
                         } finally {
-                                this.reset ();
+                                if (reset) this.reset ();
                         }
+                }
+
+                /**
+                 * Builds the {@link com.torchmind.padlock.Padlock} instance.
+                 * @return The instance.
+                 * @throws java.lang.IllegalStateException when the configuration is invalid.
+                 */
+                @Nonnull
+                public Padlock build () throws IllegalStateException {
+                        return this.build (true);
                 }
 
                 /**
