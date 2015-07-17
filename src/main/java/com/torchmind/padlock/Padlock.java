@@ -20,7 +20,9 @@ import com.torchmind.padlock.metadata.AuthenticationClaimMetadata;
 import com.torchmind.padlock.metadata.codec.IMetadataCodec;
 import com.torchmind.padlock.metadata.codec.JacksonMetadataCodec;
 import com.torchmind.padlock.security.signature.ISignatureProvider;
+import com.torchmind.padlock.security.signature.ISignatureProviderFactory;
 import com.torchmind.padlock.security.verification.IVerificationProvider;
+import com.torchmind.padlock.security.verification.IVerificationProviderFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -37,19 +39,13 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Johannes Donath
  */
 @ThreadSafe
-public class Padlock {
-        private final Lock lock = new ReentrantLock (true);
-
+public abstract class Padlock {
         private final Duration maximumValidityDuration;
         private final IMetadataCodec metadataCodec;
-        private final ISignatureProvider signatureProvider;
-        private final IVerificationProvider verificationProvider;
 
-        private Padlock (@Nullable Duration maximumValidityDuration, @Nonnull IMetadataCodec metadataCodec, @Nullable ISignatureProvider signatureProvider, @Nullable IVerificationProvider verificationProvider) {
+        protected Padlock (@Nullable Duration maximumValidityDuration, @Nonnull IMetadataCodec metadataCodec) {
                 this.maximumValidityDuration = maximumValidityDuration;
                 this.metadataCodec = metadataCodec;
-                this.signatureProvider = signatureProvider;
-                this.verificationProvider = verificationProvider;
         }
 
         /**
@@ -130,20 +126,15 @@ public class Padlock {
          */
         @Nonnull
         public <M extends AuthenticationClaimMetadata> IAuthenticationClaim<M> sign (@Nonnull Class<M> metadataType, @Nonnull M metadata) throws IllegalStateException, SignatureException {
-                this.lock.lock ();
+                ISignatureProvider provider = this.signatureProvider ();
 
-                try {
-                        ISignatureProvider provider = this.signatureProvider ();
-                        if (provider == null)
-                                throw new IllegalStateException ("Cannot sign authentication claims: No signature provider available");
+                if (provider == null)
+                        throw new IllegalStateException ("Cannot sign authentication claims: No signature provider available");
 
-                        ByteBuffer metadataBuffer = this.metadataCodec ().encode (metadataType, metadata);
-                        ByteBuffer signatureBuffer = provider.sign (metadataBuffer);
+                ByteBuffer metadataBuffer = this.metadataCodec ().encode (metadataType, metadata);
+                ByteBuffer signatureBuffer = provider.sign (metadataBuffer);
 
-                        return (new AuthenticationClaim<> (metadataType, metadata, signatureBuffer));
-                } finally {
-                        this.lock.unlock ();
-                }
+                return (new AuthenticationClaim<> (metadataType, metadata, signatureBuffer));
         }
 
         /**
@@ -154,20 +145,15 @@ public class Padlock {
          * @throws java.lang.IllegalStateException when no verification provider is available.
          */
         public <M extends AuthenticationClaimMetadata> boolean verify (@Nonnull IAuthenticationClaim<M> claim) throws IllegalStateException {
-                this.lock.lock ();
+                IVerificationProvider provider = this.verificationProvider ();
 
-                try {
-                        IVerificationProvider provider = this.verificationProvider ();
-                        if (provider == null)
-                                throw new IllegalStateException ("Cannot verify authentication claims: No verification provider available");
+                if (provider == null)
+                        throw new IllegalStateException ("Cannot verify authentication claims: No verification provider available");
 
-                        ByteBuffer metadataBuffer = this.metadataCodec ().encode (claim.metadataType (), claim.metadata ());
-                        ByteBuffer signatureBuffer = claim.signature ();
+                ByteBuffer metadataBuffer = this.metadataCodec ().encode (claim.metadataType (), claim.metadata ());
+                ByteBuffer signatureBuffer = claim.signature ();
 
-                        return provider.verify (metadataBuffer, signatureBuffer);
-                } finally {
-                        this.lock.unlock ();
-                }
+                return provider.verify (metadataBuffer, signatureBuffer);
         }
 
         /**
@@ -193,17 +179,126 @@ public class Padlock {
          * @return The provider.
          */
         @Nullable
-        public ISignatureProvider signatureProvider () {
-                return this.signatureProvider;
-        }
+        public abstract ISignatureProvider signatureProvider ();
 
         /**
          * Retrieves the verification provider.
          * @return The provider.
          */
         @Nullable
-        public IVerificationProvider verificationProvider () {
-                return this.verificationProvider;
+        public abstract IVerificationProvider verificationProvider ();
+
+        /**
+         * Provides a simple locking-based implementation of {@link com.torchmind.padlock.Padlock}.
+         */
+        public static class BlockingPadlock extends Padlock {
+                private final Lock lock = new ReentrantLock (true);
+
+                private final ISignatureProvider signatureProvider;
+                private final IVerificationProvider verificationProvider;
+
+                protected BlockingPadlock (@Nullable Duration maximumValidityDuration, @Nonnull IMetadataCodec metadataCodec, @Nullable ISignatureProvider signatureProvider, @Nullable IVerificationProvider verificationProvider) {
+                        super (maximumValidityDuration, metadataCodec);
+
+                        this.signatureProvider = signatureProvider;
+                        this.verificationProvider = verificationProvider;
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Nullable
+                @Override
+                public ISignatureProvider signatureProvider () {
+                        return this.signatureProvider;
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Nullable
+                @Override
+                public IVerificationProvider verificationProvider () {
+                        return this.verificationProvider;
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Nonnull
+                @Override
+                public <M extends AuthenticationClaimMetadata> IAuthenticationClaim<M> sign (@Nonnull Class<M> metadataType, @Nonnull M metadata) throws IllegalStateException, SignatureException {
+                        this.lock.lock ();
+
+                        try {
+                                return super.sign (metadataType, metadata);
+                        } finally {
+                                this.lock.unlock ();
+                        }
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public <M extends AuthenticationClaimMetadata> boolean verify (@Nonnull IAuthenticationClaim<M> claim) throws IllegalStateException {
+                        this.lock.lock ();
+
+                        try {
+                                return super.verify (claim);
+                        } finally {
+                                this.lock.unlock ();
+                        }
+                }
+        }
+
+        public static class ThreadLocalPadlock extends Padlock {
+                private final ThreadLocal<ISignatureProvider> signatureProvider;
+                private final ThreadLocal<IVerificationProvider> verificationProvider;
+
+                protected ThreadLocalPadlock (@Nullable Duration maximumValidityDuration, @Nonnull IMetadataCodec metadataCodec, @Nullable final ISignatureProviderFactory signatureProviderFactory, @Nullable final IVerificationProviderFactory verificationProviderFactory) {
+                        super (maximumValidityDuration, metadataCodec);
+
+                        if (signatureProviderFactory != null) {
+                                this.signatureProvider = new ThreadLocal<ISignatureProvider> () {
+                                        @Override
+                                        protected ISignatureProvider initialValue () {
+                                                return signatureProviderFactory.build ();
+                                        }
+                                };
+                        } else
+                                this.signatureProvider = null;
+
+                        if (verificationProviderFactory != null) {
+                                this.verificationProvider = new ThreadLocal<IVerificationProvider> () {
+                                        @Override
+                                        protected IVerificationProvider initialValue () {
+                                                return verificationProviderFactory.build ();
+                                        }
+                                };
+                        } else
+                                this.verificationProvider = null;
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Nullable
+                @Override
+                public ISignatureProvider signatureProvider () {
+                        if (this.signatureProvider == null) return null;
+                        return this.signatureProvider.get ();
+                }
+
+                /**
+                 * {@inheritDoc}
+                 */
+                @Nullable
+                @Override
+                public IVerificationProvider verificationProvider () {
+                        if (this.verificationProvider == null) return null;
+                        return this.verificationProvider.get ();
+                }
         }
 
         /**
@@ -212,8 +307,12 @@ public class Padlock {
         public static class Builder {
                 private Duration maximumValidityDuration;
                 private IMetadataCodec metadataCodec;
+
                 private ISignatureProvider signatureProvider;
                 private IVerificationProvider verificationProvider;
+
+                private ISignatureProviderFactory signatureProviderFactory;
+                private IVerificationProviderFactory verificationProviderFactory;
 
                 protected Builder () {
                         this.reset ();
@@ -241,7 +340,10 @@ public class Padlock {
                         if (metadataCodec == null) metadataCodec = new JacksonMetadataCodec ();
 
                         try {
-                                return (new Padlock (this.maximumValidityDuration (), metadataCodec, this.signatureProvider (), this.verificationProvider ()));
+                                if (this.signatureProviderFactory != null || this.verificationProviderFactory != null)
+                                        return (new ThreadLocalPadlock (this.maximumValidityDuration (), metadataCodec, this.signatureProviderFactory (), this.verificationProviderFactory ()));
+                                else
+                                        return (new BlockingPadlock (this.maximumValidityDuration (), metadataCodec, this.signatureProvider (), this.verificationProvider ()));
                         } finally {
                                 if (reset) this.reset ();
                         }
@@ -272,8 +374,12 @@ public class Padlock {
                 public Builder reset () {
                         this.maximumValidityDuration (Duration.ofDays (2));
                         this.metadataCodec (null);
+
                         this.signatureProvider (null);
                         this.verificationProvider (null);
+
+                        this.signatureProviderFactory (null);
+                        this.verificationProviderFactory (null);
 
                         return this;
                 }
@@ -333,12 +439,20 @@ public class Padlock {
 
                 /**
                  * Sets the signature provider.
+                 * <strong>Note:</strong> When called with non-null argument, reverts {@link #signatureProviderFactory()}
+                 * and {@link #verificationProviderFactory()}.
                  * @param signatureProvider The provider.
                  * @return The builder.
                  */
                 @Nonnull
                 public Builder signatureProvider (@Nullable ISignatureProvider signatureProvider) {
                         this.signatureProvider = signatureProvider;
+
+                        if (signatureProvider != null) {
+                                this.signatureProviderFactory (null);
+                                this.verificationProviderFactory (null);
+                        }
+
                         return this;
                 }
 
@@ -353,12 +467,76 @@ public class Padlock {
 
                 /**
                  * Sets the verification provider.
+                 * <strong>Note:</strong> When called with non-null argument, reverts {@link #signatureProviderFactory()}
+                 * and {@link #verificationProviderFactory()}.
                  * @param verificationProvider The provider.
                  * @return The builder.
                  */
                 @Nonnull
                 public Builder verificationProvider (@Nullable IVerificationProvider verificationProvider) {
                         this.verificationProvider = verificationProvider;
+
+                        if (verificationProvider != null) {
+                                this.signatureProviderFactory (null);
+                                this.verificationProviderFactory (null);
+                        }
+
+                        return this;
+                }
+
+                /**
+                 * Retrieves the signature provider factory.
+                 * @return The factory.
+                 */
+                @Nullable
+                public ISignatureProviderFactory signatureProviderFactory () {
+                        return this.signatureProviderFactory;
+                }
+
+                /**
+                 * Sets the signature provider factory.
+                 * <strong>Note:</strong> When called with non-null argument, reverts {@link #signatureProvider()} and
+                 * {@link #verificationProvider()}.
+                 * @param signatureProviderFactory The factory.
+                 * @return The builder.
+                 */
+                @Nonnull
+                public Builder signatureProviderFactory (@Nullable ISignatureProviderFactory signatureProviderFactory) {
+                        this.signatureProviderFactory = signatureProviderFactory;
+
+                        if (signatureProviderFactory != null) {
+                                this.signatureProvider (null);
+                                this.verificationProvider (null);
+                        }
+
+                        return this;
+                }
+
+                /**
+                 * Retrieves the verification provider factory.
+                 * @return The factory.
+                 */
+                @Nullable
+                public IVerificationProviderFactory verificationProviderFactory () {
+                        return this.verificationProviderFactory;
+                }
+
+                /**
+                 * Sets the verification provider factory.
+                 * <strong>Note:</strong> When called with non-null argument, reverts {@link #signatureProvider()} and
+                 * {@link #verificationProvider()}.
+                 * @param verificationProviderFactory The factory.
+                 * @return The builder.
+                 */
+                @Nonnull
+                public Builder verificationProviderFactory (@Nullable IVerificationProviderFactory verificationProviderFactory) {
+                        this.verificationProviderFactory = verificationProviderFactory;
+
+                        if (verificationProviderFactory != null) {
+                                this.signatureProvider (null);
+                                this.verificationProvider (null);
+                        }
+
                         return this;
                 }
         }
