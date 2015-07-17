@@ -252,6 +252,9 @@ public abstract class Padlock {
                 }
         }
 
+        /**
+         * Provides a {@link java.lang.ThreadLocal} based implementation of {@link com.torchmind.padlock.Padlock}.
+         */
         public static class ThreadLocalPadlock extends Padlock {
                 private final ThreadLocal<ISignatureProvider> signatureProvider;
                 private final ThreadLocal<IVerificationProvider> verificationProvider;
