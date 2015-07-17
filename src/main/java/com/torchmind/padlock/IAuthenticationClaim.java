@@ -19,6 +19,7 @@ package com.torchmind.padlock;
 import com.torchmind.padlock.metadata.AuthenticationClaimMetadata;
 
 import javax.annotation.Nonnull;
+import java.nio.ByteBuffer;
 
 /**
  * Represents an authentication claim.
@@ -38,5 +39,5 @@ public interface IAuthenticationClaim<M extends AuthenticationClaimMetadata> {
          * @return The signature.
          */
         @Nonnull
-        byte[] signature ();
+        ByteBuffer signature ();
 }

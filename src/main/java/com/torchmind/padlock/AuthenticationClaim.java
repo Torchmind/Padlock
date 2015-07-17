@@ -19,6 +19,7 @@ package com.torchmind.padlock;
 import com.torchmind.padlock.metadata.AuthenticationClaimMetadata;
 
 import javax.annotation.Nonnull;
+import java.nio.ByteBuffer;
 
 /**
  * Provides an implementation of {@link com.torchmind.padlock.IAuthenticationClaim} for internal use.
@@ -26,9 +27,9 @@ import javax.annotation.Nonnull;
  */
 class AuthenticationClaim<M extends AuthenticationClaimMetadata> implements IAuthenticationClaim<M> {
         private final M metadata;
-        private final byte[] signature;
+        private final ByteBuffer signature;
 
-        public AuthenticationClaim (@Nonnull M metadata, @Nonnull byte[] signature) {
+        public AuthenticationClaim (@Nonnull M metadata, @Nonnull ByteBuffer signature) {
                 this.metadata = metadata;
                 this.signature = signature;
         }
@@ -51,7 +52,7 @@ class AuthenticationClaim<M extends AuthenticationClaimMetadata> implements IAut
          */
         @Nonnull
         @Override
-        public byte[] signature () {
+        public ByteBuffer signature () {
                 return this.signature;
         }
 }
