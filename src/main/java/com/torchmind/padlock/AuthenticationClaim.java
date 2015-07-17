@@ -66,4 +66,31 @@ class AuthenticationClaim<M extends AuthenticationClaimMetadata> implements IAut
         public ByteBuffer signature () {
                 return this.signature;
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals (Object o) {
+                if (this == o) { return true; }
+                if (!(o instanceof AuthenticationClaim)) { return false; }
+
+                AuthenticationClaim<?> that = (AuthenticationClaim<?>) o;
+
+                if (!metadata.equals (that.metadata)) { return false; }
+                if (!metadataType.equals (that.metadataType)) { return false; }
+                return signature.equals (that.signature);
+
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int hashCode () {
+                int result = metadata.hashCode ();
+                result = 31 * result + metadataType.hashCode ();
+                result = 31 * result + signature.hashCode ();
+                return result;
+        }
 }
