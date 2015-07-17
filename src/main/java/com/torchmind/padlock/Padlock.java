@@ -29,8 +29,8 @@ import java.nio.ByteBuffer;
 import java.security.SignatureException;
 import java.time.Duration;
 import java.util.Base64;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Provides access to the Padlock en/de-coders.
@@ -38,6 +38,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 @ThreadSafe
 public final class Padlock {
+        private final Lock lock = new ReentrantLock (true);
+
         private final Duration maximumValidityDuration;
         private final IMetadataCodec metadataCodec;
         private final ISignatureProvider signatureProvider;
@@ -128,13 +130,20 @@ public final class Padlock {
          */
         @Nonnull
         public <M extends AuthenticationClaimMetadata> IAuthenticationClaim<M> sign (@Nonnull Class<M> metadataType, @Nonnull M metadata) throws IllegalStateException, SignatureException {
-                ISignatureProvider provider = this.signatureProvider ();
-                if (provider == null) throw new IllegalStateException ("Cannot sign authentication claims: No signature provider available");
+                this.lock.lock ();
 
-                ByteBuffer metadataBuffer = this.metadataCodec ().encode (metadataType, metadata);
-                ByteBuffer signatureBuffer = provider.sign (metadataBuffer);
+                try {
+                        ISignatureProvider provider = this.signatureProvider ();
+                        if (provider == null)
+                                throw new IllegalStateException ("Cannot sign authentication claims: No signature provider available");
 
-                return (new AuthenticationClaim<> (metadataType, metadata, signatureBuffer));
+                        ByteBuffer metadataBuffer = this.metadataCodec ().encode (metadataType, metadata);
+                        ByteBuffer signatureBuffer = provider.sign (metadataBuffer);
+
+                        return (new AuthenticationClaim<> (metadataType, metadata, signatureBuffer));
+                } finally {
+                        this.lock.unlock ();
+                }
         }
 
         /**
@@ -145,13 +154,20 @@ public final class Padlock {
          * @throws java.lang.IllegalStateException when no verification provider is available.
          */
         public <M extends AuthenticationClaimMetadata> boolean verify (@Nonnull IAuthenticationClaim<M> claim) throws IllegalStateException {
-                IVerificationProvider provider = this.verificationProvider ();
-                if (provider == null) throw new IllegalStateException ("Cannot verify authentication claims: No verification provider available");
+                this.lock.lock ();
 
-                ByteBuffer metadataBuffer = this.metadataCodec ().encode (claim.metadataType (), claim.metadata ());
-                ByteBuffer signatureBuffer = claim.signature ();
+                try {
+                        IVerificationProvider provider = this.verificationProvider ();
+                        if (provider == null)
+                                throw new IllegalStateException ("Cannot verify authentication claims: No verification provider available");
 
-                return provider.verify (metadataBuffer, signatureBuffer);
+                        ByteBuffer metadataBuffer = this.metadataCodec ().encode (claim.metadataType (), claim.metadata ());
+                        ByteBuffer signatureBuffer = claim.signature ();
+
+                        return provider.verify (metadataBuffer, signatureBuffer);
+                } finally {
+                        this.lock.unlock ();
+                }
         }
 
         /**
