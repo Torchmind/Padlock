@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
  * Provides a factory for {@link com.torchmind.padlock.security.IProvider} instances.
  * @author Johannes Donath
  */
-public interface IProviderFactory<T extends IProvider> {
+public interface IProviderFactory {
 
         /**
          * Builds a new provider instance.
@@ -30,5 +30,5 @@ public interface IProviderFactory<T extends IProvider> {
          * @return The provider.
          */
         @Nonnull
-        T build () throws IllegalStateException;
+        IProvider build () throws IllegalStateException;
 }

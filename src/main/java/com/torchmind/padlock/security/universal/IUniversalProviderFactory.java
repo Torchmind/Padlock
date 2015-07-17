@@ -16,8 +16,10 @@
  */
 package com.torchmind.padlock.security.universal;
 
+import com.torchmind.padlock.security.IProvider;
 import com.torchmind.padlock.security.IProviderFactory;
 
+import javax.annotation.Nonnull;
 import java.security.Key;
 
 /**
@@ -25,5 +27,12 @@ import java.security.Key;
  * @author Johannes Donath
  */
 @FunctionalInterface
-public interface IUniversalProviderFactory<T extends IUniversalProvider> extends IProviderFactory<T> {
+public interface IUniversalProviderFactory extends IProviderFactory {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Nonnull
+        @Override
+        IUniversalProvider build () throws IllegalStateException;
 }

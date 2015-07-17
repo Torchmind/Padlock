@@ -16,8 +16,10 @@
  */
 package com.torchmind.padlock.security.verification;
 
+import com.torchmind.padlock.security.IProvider;
 import com.torchmind.padlock.security.IProviderFactory;
 
+import javax.annotation.Nonnull;
 import java.security.Key;
 
 /**
@@ -25,5 +27,12 @@ import java.security.Key;
  * @author Johannes Donath
  */
 @FunctionalInterface
-public interface IVerificationProviderFactory<T extends IVerificationProvider> extends IProviderFactory<T> {
+public interface IVerificationProviderFactory extends IProviderFactory {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Nonnull
+        @Override
+        IVerificationProvider build () throws IllegalStateException;
 }

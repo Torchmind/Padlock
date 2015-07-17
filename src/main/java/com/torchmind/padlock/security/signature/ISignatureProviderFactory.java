@@ -16,8 +16,10 @@
  */
 package com.torchmind.padlock.security.signature;
 
+import com.torchmind.padlock.security.IProvider;
 import com.torchmind.padlock.security.IProviderFactory;
 
+import javax.annotation.Nonnull;
 import java.security.Key;
 
 /**
@@ -25,5 +27,12 @@ import java.security.Key;
  * @author Johannes Donath
  */
 @FunctionalInterface
-public interface ISignatureProviderFactory<T extends ISignatureProvider> extends IProviderFactory<T> {
+public interface ISignatureProviderFactory extends IProviderFactory {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Nonnull
+        @Override
+        ISignatureProvider build () throws IllegalStateException;
 }
