@@ -56,7 +56,7 @@ When running maven you may simply add a new dependency along with our repository
 ```
 
 En/De-Coding authentication claims:
-```java
+```Java
 String encodedClaim = ...;
 Padlock padlock = Padlock.builder ().build ();
 
@@ -65,7 +65,7 @@ encodedClaim = padlock.encode (claim);
 ```
 
 Signing/Verifying authentication claims:
-```java
+```Java
 AuthenticationClaimMetadata claimMetadata = ...;
 ISignatureProvider signatureProvider = ...;
 IVerificationProvider verificationProvider = ...;
