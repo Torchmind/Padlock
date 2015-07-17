@@ -35,6 +35,13 @@ public interface IAuthenticationClaim<M extends AuthenticationClaimMetadata> {
         M metadata ();
 
         /**
+         * Retrieves the claim metadata type.
+         * @return The type.
+         */
+        @Nonnull
+        Class<M> metadataType ();
+
+        /**
          * Retrieves the claim signature.
          * @return The signature.
          */

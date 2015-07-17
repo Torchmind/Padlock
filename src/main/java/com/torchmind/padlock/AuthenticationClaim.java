@@ -27,15 +27,17 @@ import java.nio.ByteBuffer;
  */
 class AuthenticationClaim<M extends AuthenticationClaimMetadata> implements IAuthenticationClaim<M> {
         private final M metadata;
+        private final Class<M> metadataType;
         private final ByteBuffer signature;
 
-        public AuthenticationClaim (@Nonnull M metadata, @Nonnull ByteBuffer signature) {
+        public AuthenticationClaim (@Nonnull Class<M> metadataType, @Nonnull M metadata, @Nonnull ByteBuffer signature) {
+                this.metadataType = metadataType;
                 this.metadata = metadata;
                 this.signature = signature;
         }
 
         public AuthenticationClaim (@Nonnull AuthenticationClaim<M> claim) {
-                this (claim.metadata (), claim.signature ());
+                this (claim.metadataType (), claim.metadata (), claim.signature ());
         }
 
         /**
@@ -45,6 +47,15 @@ class AuthenticationClaim<M extends AuthenticationClaimMetadata> implements IAut
         @Override
         public M metadata () {
                 return this.metadata;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Nonnull
+        @Override
+        public Class<M> metadataType () {
+                return this.metadataType;
         }
 
         /**
