@@ -240,7 +240,11 @@ public final class Padlock {
                         IMetadataCodec metadataCodec = this.metadataCodec ();
                         if (metadataCodec == null) metadataCodec = new JacksonMetadataCodec ();
 
-                        return (new Padlock (this.maximumValidityDuration (), metadataCodec, this.signatureProvider (), this.verificationProvider ()));
+                        try {
+                                return (new Padlock (this.maximumValidityDuration (), metadataCodec, this.signatureProvider (), this.verificationProvider ()));
+                        } finally {
+                                this.reset ();
+                        }
                 }
 
                 /**
