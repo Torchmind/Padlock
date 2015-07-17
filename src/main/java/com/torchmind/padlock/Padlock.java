@@ -131,6 +131,9 @@ public abstract class Padlock {
                 if (provider == null)
                         throw new IllegalStateException ("Cannot sign authentication claims: No signature provider available");
 
+                if (this.maximumValidityDuration () != null && metadata.validity ().compareTo (this.maximumValidityDuration ()) == 1)
+                        throw new IllegalArgumentException ("Cannot sign claim with period of " + metadata.validity ().getSeconds () + " seconds (limit is " + this.maximumValidityDuration ().getSeconds () + " seconds)");
+
                 ByteBuffer metadataBuffer = this.metadataCodec ().encode (metadataType, metadata);
                 ByteBuffer signatureBuffer = provider.sign (metadataBuffer);
 
