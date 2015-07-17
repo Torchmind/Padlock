@@ -53,6 +53,10 @@ public class AuthenticationClaimMetadata {
                 this (identifier, Instant.now (), duration);
         }
 
+        public AuthenticationClaimMetadata (@Nonnull AuthenticationClaimMetadata metadata) {
+                this (metadata.identifier (), metadata.issuance (), metadata.expiration ());
+        }
+
         /**
          * Retrieves the claim identifier.
          * @return The identifier.

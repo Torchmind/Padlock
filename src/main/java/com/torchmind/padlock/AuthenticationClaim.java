@@ -33,6 +33,10 @@ class AuthenticationClaim<M extends AuthenticationClaimMetadata> implements IAut
                 this.signature = signature;
         }
 
+        public AuthenticationClaim (@Nonnull AuthenticationClaim<M> claim) {
+                this (claim.metadata (), claim.signature ());
+        }
+
         /**
          * {@inheritDoc}
          */
