@@ -209,7 +209,7 @@ public final class Padlock {
         /**
          * Provides a factory for {@link com.torchmind.padlock.Padlock} instances.
          */
-        public static class Builder implements Cloneable {
+        public static class Builder {
                 private Duration maximumValidityDuration;
                 private IMetadataCodec metadataCodec;
                 private ISignatureProvider signatureProvider;
@@ -257,10 +257,10 @@ public final class Padlock {
                 }
 
                 /**
-                 * {@inheritDoc}
+                 * Copies the builder.
+                 * @return The new builder.
                  */
-                @Override
-                protected Builder clone () {
+                protected Builder copy () {
                         return (new Builder (this));
                 }
 
