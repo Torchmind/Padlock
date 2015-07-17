@@ -37,7 +37,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Johannes Donath
  */
 @ThreadSafe
-public final class Padlock {
+public class Padlock {
         private final Lock lock = new ReentrantLock (true);
 
         private final Duration maximumValidityDuration;
