@@ -26,8 +26,9 @@ public interface IProviderFactory<T extends IProvider> {
 
         /**
          * Builds a new provider instance.
+         * @throws java.lang.IllegalStateException when constructing the provider fails.
          * @return The provider.
          */
         @Nonnull
-        T build ();
+        T build () throws IllegalStateException;
 }
