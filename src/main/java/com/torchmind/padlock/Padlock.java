@@ -67,7 +67,7 @@ public final class Padlock {
          * @throws java.lang.IllegalArgumentException when the claim is malformed.
          */
         @Nonnull
-        public <M extends AuthenticationClaimMetadata> AuthenticationClaim<M> decode (@Nonnull Class<M> type, @Nonnull String claim) throws IllegalArgumentException {
+        public <M extends AuthenticationClaimMetadata> IAuthenticationClaim<M> decode (@Nonnull Class<M> type, @Nonnull String claim) throws IllegalArgumentException {
                 int separatorIndex = claim.indexOf ('.');
                 if (separatorIndex == -1) throw new IllegalArgumentException ("Missing signature separator in claim: " + claim);
 
@@ -88,7 +88,7 @@ public final class Padlock {
          * @param <M> The claim type.
          * @return The encoded claim.
          */
-        public <M extends AuthenticationClaimMetadata> String encode (@Nonnull AuthenticationClaim<M> claim) {
+        public <M extends AuthenticationClaimMetadata> String encode (@Nonnull IAuthenticationClaim<M> claim) {
                 byte[] metadataBytes;
                 byte[] signatureBytes;
 
@@ -127,7 +127,7 @@ public final class Padlock {
          * @throws java.security.SignatureException when encoding the signature fails.
          */
         @Nonnull
-        public <M extends AuthenticationClaimMetadata> AuthenticationClaim<M> sign (@Nonnull Class<M> metadataType, @Nonnull M metadata) throws IllegalStateException, SignatureException {
+        public <M extends AuthenticationClaimMetadata> IAuthenticationClaim<M> sign (@Nonnull Class<M> metadataType, @Nonnull M metadata) throws IllegalStateException, SignatureException {
                 ISignatureProvider provider = this.signatureProvider ();
                 if (provider == null) throw new IllegalStateException ("Cannot sign authentication claims: No signature provider available");
 
@@ -144,7 +144,7 @@ public final class Padlock {
          * @return True if valid.
          * @throws java.lang.IllegalStateException when no verification provider is available.
          */
-        public <M extends AuthenticationClaimMetadata> boolean verify (@Nonnull AuthenticationClaim<M> claim) throws IllegalStateException {
+        public <M extends AuthenticationClaimMetadata> boolean verify (@Nonnull IAuthenticationClaim<M> claim) throws IllegalStateException {
                 IVerificationProvider provider = this.verificationProvider ();
                 if (provider == null) throw new IllegalStateException ("Cannot verify authentication claims: No verification provider available");
 
