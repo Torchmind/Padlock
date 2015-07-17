@@ -77,6 +77,7 @@ public class JacksonMetadataCodec implements IMetadataCodec {
                 try {
                         byte[] encodedBytes = new byte[encoded.remaining ()];
                         encoded.get (encodedBytes);
+                        encoded.rewind ();
 
                         return this.reader ().withType (type).readValue (encodedBytes);
                 } catch (IOException ex) {

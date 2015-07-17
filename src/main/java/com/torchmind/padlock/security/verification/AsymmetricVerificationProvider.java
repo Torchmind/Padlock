@@ -62,6 +62,7 @@ public class AsymmetricVerificationProvider extends AbstractDelegatingProvider<S
                         // extract signature - Thanks Oracle
                         byte[] signatureBytes = new byte[signature.remaining ()];
                         signature.get (signatureBytes);
+                        signature.rewind ();
 
                         return this.provider ().verify (signatureBytes);
                 } catch (SignatureException ex) {

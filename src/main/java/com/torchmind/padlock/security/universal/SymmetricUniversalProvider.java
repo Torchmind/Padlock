@@ -58,6 +58,8 @@ public class SymmetricUniversalProvider extends AbstractDelegatingProvider<Mac, 
         @Override
         public ByteBuffer sign (@Nonnull ByteBuffer metadata) throws SignatureException {
                 this.provider ().update (metadata);
+                metadata.rewind ();
+
                 return ByteBuffer.wrap (this.provider ().doFinal ());
         }
 
@@ -67,9 +69,11 @@ public class SymmetricUniversalProvider extends AbstractDelegatingProvider<Mac, 
         @Override
         public boolean verify (@Nonnull ByteBuffer metadata, @Nonnull ByteBuffer signature) {
                 this.provider ().update (metadata);
+                metadata.rewind ();
 
                 byte[] signatureBytes = new byte[signature.remaining ()];
                 signature.get (signatureBytes);
+                signature.rewind ();
 
                 return Arrays.equals (this.provider ().doFinal (), signatureBytes);
         }

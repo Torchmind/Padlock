@@ -57,6 +57,8 @@ public class AsymmetricSignatureProvider extends AbstractDelegatingProvider<Sign
         @Override
         public ByteBuffer sign (@Nonnull ByteBuffer metadata) throws SignatureException {
                 this.provider ().update (metadata);
+                metadata.rewind ();
+
                 return ByteBuffer.wrap (this.provider ().sign ());
         }
 }
