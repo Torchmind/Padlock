@@ -265,24 +265,14 @@ public abstract class Padlock {
                 protected ThreadLocalPadlock (@Nullable Duration maximumValidityDuration, @Nonnull IMetadataCodec metadataCodec, @Nullable final ISignatureProviderFactory signatureProviderFactory, @Nullable final IVerificationProviderFactory verificationProviderFactory) {
                         super (maximumValidityDuration, metadataCodec);
 
-                        if (signatureProviderFactory != null) {
-                                this.signatureProvider = new ThreadLocal<ISignatureProvider> () {
-                                        @Override
-                                        protected ISignatureProvider initialValue () {
-                                                return signatureProviderFactory.build ();
-                                        }
-                                };
-                        } else
+                        if (signatureProviderFactory != null)
+                                this.signatureProvider = ThreadLocal.withInitial (signatureProviderFactory::build);
+                        else
                                 this.signatureProvider = null;
 
-                        if (verificationProviderFactory != null) {
-                                this.verificationProvider = new ThreadLocal<IVerificationProvider> () {
-                                        @Override
-                                        protected IVerificationProvider initialValue () {
-                                                return verificationProviderFactory.build ();
-                                        }
-                                };
-                        } else
+                        if (verificationProviderFactory != null)
+                                this.verificationProvider = ThreadLocal.withInitial (verificationProviderFactory::build);
+                        else
                                 this.verificationProvider = null;
                 }
 
